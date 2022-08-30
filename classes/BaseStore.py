@@ -17,16 +17,16 @@ class BaseStore(Storage):
 
     def add(self, title, count):
         if count > self.get_free_space():
-            raise NotPlaceForItems('Недостаточно места')
+            raise NotPlaceForItems('Недостаточно места на складе')
         self.items[title] = self.items.get(title, 0) + count
 
     def remove(self, title, count):
-        if self.items.get(title) is None:
-            raise NotFoundItems("Такой товар не найден")
-        if count < self.get_free_space():
-            self.items[title] = self.items.get(title) - count
-        elif count > self.items[title] == 0:
-            raise NotEnoughItems("Недостаточно товаров")
+        current_count = self.items.get(title)
+        if current_count is None:
+            raise NotFoundItems("Такого товара нет")
+        if current_count - count < 0:
+            raise NotEnoughItems("Не хватает товара на складе")
+        self.items[title] = current_count - count
 
     def get_free_space(self):
         return self.capacity - sum(self.items.values())
